@@ -25,6 +25,10 @@ func NewClient(url string) (*Client, error) {
 	}, nil
 }
 
+func (c *Client) Close() error {
+	return c.conn.Close()
+}
+
 func (c *Client) PostProduct(ctx context.Context, name, description string, price float64) (*Product, error) {
 	resp, err := c.service.PostProduct(
 		ctx,
