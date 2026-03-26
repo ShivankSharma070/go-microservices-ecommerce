@@ -73,7 +73,7 @@ func (r *postgresRepository) PutOrder(ctx context.Context, o Order) (err error) 
 	return
 }
 
-func (r *postgresRepository) GetOrderForAccount(ctx context.Context, accountID ntring) ([]Order, error) {
+func (r *postgresRepository) GetOrderForAccount(ctx context.Context, accountID string) ([]Order, error) {
 	rows, err := r.db.QueryContext(ctx,
 		`SELECT
 	o.id,
