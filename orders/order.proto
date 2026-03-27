@@ -33,14 +33,6 @@ message PostOrderResponse {
   Order order = 1;
 }
 
-message GetOrderRequest {
-  string id = 1;
-}
-
-message GetOrderResponse {
-  Order order = 1;
-}
-
 message GetOrderForAccountRequest {
   string account_id = 1;
 }

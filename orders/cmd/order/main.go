@@ -26,6 +26,7 @@ func main() {
 	retry.ForeverSleep(2*time.Second, func(_ int) (err error) {
 		r, err = orders.NewPostgresRepository(cfg.DatabaseURL)
 		if err != nil {
+			log.Println("Unable to connect to db: ",err)
 			return err
 		}
 		return
