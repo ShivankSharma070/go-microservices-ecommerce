@@ -2,35 +2,39 @@ package main
 
 import (
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/ShivankSharma070/go-microservices-ecommerce/account"
+	"github.com/ShivankSharma070/go-microservices-ecommerce/catalog"
+	"github.com/ShivankSharma070/go-microservices-ecommerce/orders"
+	
 )
 
 type Server struct {
-	// accountClient *account.Client
-	// catalogClient *catalog.Client
-	// orderClient *order.Client
+	accountClient *account.Client
+	catalogClient *catalog.Client
+	orderClient *orders.Client
 }
 
 func NewGraphQLServer(accountUrl, catalogUrl, orderUrl string) (*Server, error) {
-	// accountClient, err := account.NewClient(accountUrl)
-	// if err != nil {
-	// 	return err
-	// }
-	// catalogClient, err := catalog.NewClient(catalogUrl)
-	// if err != nil {
-	// 	accountClient.Close()
-	// 	return err
-	// }
-	// orderClient, err := order.NewClient(orderUrl)
-	// if err != nil {
-	// 	accountClient.Close()
-	// 	catalogClient.Close()
-	// 	return err
-	// }
+	accountClient, err := account.NewClient(accountUrl)
+	if err != nil {
+		return nil, err
+	}
+	catalogClient, err := catalog.NewClient(catalogUrl)
+	if err != nil {
+		accountClient.Close()
+		return nil, err
+	}
+	orderClient, err := orders.NewClient(orderUrl)
+	if err != nil {
+		accountClient.Close()
+		catalogClient.Close()
+		return nil, err
+	}
 
 	return &Server{
-	// accountClient,
-	// catalogClient,
-	// orderClient,
+	accountClient,
+	catalogClient,
+	orderClient,
 	}, nil
 }
 
