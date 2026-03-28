@@ -1,8 +1,74 @@
 services:
   account:
+    build:
+      context: .
+      dockerfile: ./account/app.dockerfile
+    depends_on:
+      - account_db
+    environment:
+      DATABASE_URL: postgres://shivank:123456@account_db/shivank?sslmode=disable
+    restart: on-failure
+
   catalog:
-  order:
+    build:
+      context: .
+      dockerfile: ./catalog/app.dockerfile
+    depends_on:
+      - catalog_db
+    environment:
+      DATABASE_URL: http://catalog_db:9200
+    restart: on-failure
+
+  orders:
+    build:
+      context: .
+      dockerfile: ./orders/app.dockerfile
+    depends_on:
+      - orders_db
+    environment:
+      DATABASE_URL: postgres://shivank:123456@orders_db/shivank?sslmode=disable
+      ACCOUNT_SERVICE_URL: account:8080
+      CATALOG_SERVICE_URL: catalog:8080
+    restart: on-failure
+
   graphql:
+    build:
+      context: .
+      dockerfile: ./graphql/app.dockerfile
+    ports:
+      - 8000:8080
+    depends_on:
+      - account
+      - catalog
+    environment:
+      ACCOUNT_SERVICE_URL: account:8080
+      CATALOG_SERVICE_URL: catalog:8080
+      ORDER_SERVICE_URL: orders:8080
+    restart: on-failure
+
   account_db:
+    build:
+      context: ./account
+      dockerfile: ./db.dockerfile
+    environment:
+      POSTGRES_DB: shivank
+      POSTGRES_USER: shivank
+      POSTGRES_PASSWORD: 123456
+    restart: unless-stopped
+
   catalog_db:
-  order_db:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.1
+    environment:
+      ES_JAVA_OPTS: -Xms1g -Xmx1g
+      discovery.type: single-node
+      xpack.security.enabled: false
+
+  orders_db:
+    build:
+      context: ./orders
+      dockerfile: ./db.dockerfile
+    environment:
+      POSTGRES_DB: shivank
+      POSTGRES_USER: shivank
+      POSTGRES_PASSWORD: 123456
+    restart: unless-stopped
