@@ -42,7 +42,6 @@ func (s *grpcServer) PostProduct(ctx context.Context, r *pb.PostProductRequest) 
 			Price:       p.Price,
 		},
 	}, nil
-
 }
 
 func (s *grpcServer) GetProduct(ctx context.Context, r *pb.GetProductRequest) (*pb.GetProductResponse, error) {
@@ -67,7 +66,7 @@ func (s *grpcServer) GetProducts(ctx context.Context, r *pb.GetProductsRequest) 
 
 	if r.Query != "" {
 		res, err = s.service.SearchProducts(ctx, r.Query, r.Skip, r.Take)
-	} else if len(r.Ids) != 0 {
+	} else if r.Ids != nil && len(r.Ids) != 0 {
 		res, err = s.service.ListProductsWithIDs(ctx, r.Ids)
 	} else {
 		res, err = s.service.ListProducts(ctx, r.Skip, r.Take)

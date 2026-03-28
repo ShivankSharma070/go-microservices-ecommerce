@@ -21,14 +21,13 @@ type Repository interface {
 	SearchProducts(ctx context.Context, query string, skip, take uint64) ([]Product, error)
 }
 
-
 type elasticRepository struct {
 	client *elastic.Client
 }
 
 type productDocument struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
 	Price       float64 `json:"price"`
 }
 
@@ -51,7 +50,6 @@ func (r *elasticRepository) Close() error {
 func (r *elasticRepository) PostProduct(ctx context.Context, p Product) error {
 	_, err := r.client.Index().
 		Index("catalog").
-		Type("Product").
 		Id(p.ID).
 		BodyJson(productDocument{
 			Name:        p.Name,
@@ -65,7 +63,6 @@ func (r *elasticRepository) PostProduct(ctx context.Context, p Product) error {
 func (r *elasticRepository) GetProductByID(ctx context.Context, id string) (*Product, error) {
 	res, err := r.client.Get().
 		Index("catalog").
-		Type("product").
 		Id(id).
 		Do(ctx)
 	if err != nil {
@@ -91,7 +88,6 @@ func (r *elasticRepository) GetProductByID(ctx context.Context, id string) (*Pro
 func (r *elasticRepository) ListProducts(ctx context.Context, skip, take uint64) ([]Product, error) {
 	res, err := r.client.Search().
 		Index("catalog").
-		Type("product").
 		Query(elastic.NewMatchAllQuery()).
 		From(int(skip)).Size(int(take)).
 		Do(ctx)
@@ -122,7 +118,6 @@ func (r *elasticRepository) ListProductsWithIDs(ctx context.Context, ids []strin
 		items = append(items,
 			elastic.NewMultiGetItem().
 				Index("catalog").
-				Type("product").
 				Id(id),
 		)
 	}
@@ -151,7 +146,6 @@ func (r *elasticRepository) ListProductsWithIDs(ctx context.Context, ids []strin
 func (r *elasticRepository) SearchProducts(ctx context.Context, query string, skip, take uint64) ([]Product, error) {
 	res, err := r.client.Search().
 		Index("catalog").
-		Type("product").
 		Query(elastic.NewMultiMatchQuery(query, "name", "description")).
 		From(int(skip)).Size(int(take)).
 		Do(ctx)
