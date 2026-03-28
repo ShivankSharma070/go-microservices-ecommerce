@@ -29,7 +29,7 @@ func NewPostgresRepository(url string) (Repository, error) {
 
 	return &postgresRepository{
 		db: db,
-	}, err
+	}, nil
 }
 
 func (r *postgresRepository) Close() error {
@@ -82,7 +82,7 @@ func (r *postgresRepository) GetOrderForAccount(ctx context.Context, accountID s
 	o.total_price::money::numeric::float8,
 	op.product_id,
 	op.quantity
-	FROM orders o JOIN ordered_products op ON(o.id == op.order_id)
+	FROM orders o JOIN order_products op ON(o.id = op.order_id)
 	WHERE o.account_id = $1
 	ORDER BY o.id `,
 		accountID)
@@ -98,7 +98,7 @@ func (r *postgresRepository) GetOrderForAccount(ctx context.Context, accountID s
 	orderedProduct := &OrderedProduct{}
 	products := []OrderedProduct{}
 
-	if rows.Next() {
+	for rows.Next() {
 		if err = rows.Scan(
 			&order.ID,
 			&order.CreatedAt,
@@ -127,17 +127,17 @@ func (r *postgresRepository) GetOrderForAccount(ctx context.Context, accountID s
 			ID:       orderedProduct.ID,
 			Quantity: orderedProduct.Quantity,
 		})
-		
+
 		*lastOrder = *order
 	}
 
-	if lastOrder != nil {
+	if lastOrder.ID != "" {
 		newOrder := Order{
 			ID:         lastOrder.ID,
 			CreatedAt:  lastOrder.CreatedAt,
 			AccountId:  lastOrder.AccountId,
 			TotalPrice: lastOrder.TotalPrice,
-			Products:   lastOrder.Products,
+			Products:   products,
 		}
 
 		orders = append(orders, newOrder)

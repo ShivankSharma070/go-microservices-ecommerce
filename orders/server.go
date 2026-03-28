@@ -59,6 +59,10 @@ func (s *grpcServer) PostOrder(ctx context.Context, r *pb.PostOrderRequest) (*pb
 	}
 
 	productIds := []string{}
+	for _, p := range r.Products {
+		productIds = append(productIds, p.ProductId)
+	}
+
 	orderedProducts, err := s.catalogClient.GetProducts(ctx, "", productIds, 0, 0)
 	if err != nil {
 		log.Println("Error getting products")

@@ -10,8 +10,8 @@ import (
 )
 
 type Config struct {
-	DatabaseURL string `envconfig:"DATABASE_SERVICE_URL"`
-	CatalogURL  string `envconfig:"DATABASE_SERVICE_URL"`
+	DatabaseURL string `envconfig:"DATABASE_URL"`
+	CatalogURL  string `envconfig:"CATALOG_SERVICE_URL"`
 	AccountURL  string `envconfig:"ACCOUNT_SERVICE_URL"`
 }
 
